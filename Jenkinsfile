@@ -2,18 +2,19 @@ pipeline {
     agent any
 
     tools {
-        nodejs "NodeJS_18"  
+        nodejs "NodeJS_18" // NodeJS tool name in Jenkins (make sure it's configured)
     }
 
     environment {
-        EC2_IP = '54.225.55.201'
-        APP_DIR = "/home/ec2-user/sample-node-app"
+        EC2_USER = "ec2-user"
+        EC2_HOST = "54.225.55.201"
+        PEM_PATH = "LLB.pem" // Path to your private key stored on Jenkins server
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/IamY0uu/sample-nodejs-app.git'  
+                git 'https://github.com/IamY0uu/sample-nodejs-app.git'
             }
         }
 
@@ -23,36 +24,16 @@ pipeline {
             }
         }
 
-        stage('Build') {
-            steps {
-                sh 'npm run build'
-            }
-        }
-
         stage('Deploy to EC2') {
             steps {
-                sshagent(['ec2-ssh-key']) {
-                    sh '''
-                    rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./ ec2-user@54.225.55.201:/home/ec2-user/sample-node-app
+                sh '''
+                echo "Copying files to EC2..."
+                scp -o StrictHostKeyChecking=no -i $PEM_PATH -r * $EC2_USER@$EC2_HOST:/home/ec2-user/node-app
 
-                    ssh -o StrictHostKeyChecking=no ec2-user@54.225.55.201 '
-                        cd /home/ec2-user/sample-node-app &&
-                        npm install &&
-                        pm2 delete node-app || true &&
-                        pm2 start index.js --name node-app
-                    '
-                    '''
-                }
+                echo "Starting app on EC2..."
+                ssh -o StrictHostKeyChecking=no -i $PEM_PATH $EC2_USER@$EC2_HOST 'cd /home/ec2-user/node-app && nohup node index.js > app.log 2>&1 &'
+                '''
             }
-        }
-    }
-
-    post {
-        success {
-            echo '✅ Successfully Deployed to EC2!'
-        }
-        failure {
-            echo '❌ Deployment failed.'
         }
     }
 }
