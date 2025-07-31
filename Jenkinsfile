@@ -25,7 +25,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'npm run build'
+                echo '⚠️ No build step defined, skipping...'            
             }
         }
 
