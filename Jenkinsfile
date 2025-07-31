@@ -23,11 +23,6 @@ pipeline {
             }
         }
 
-        stage('Build') {
-            steps {
-                echo '⚠️ No build step defined, skipping...'            
-            }
-        }
 
         stage('Deploy to EC2') {
             steps {
