@@ -24,16 +24,17 @@ pipeline {
             }
         }
 
-        stage('Deploy to EC2') {
-            steps {
-                sh '''
-                echo "Copying files to EC2..."
-                scp -o StrictHostKeyChecking=no -i $PEM_PATH -r * $EC2_USER@$EC2_HOST:/home/ec2-user/node-app
+stage('Deploy to EC2') {
+    steps {
+        sh '''
+        echo "Copying files to EC2 (excluding .pem)..."
+        rsync -av --exclude='LLB.pem' -e "ssh -o StrictHostKeyChecking=no -i $PEM_PATH" ./ $EC2_USER@$EC2_HOST:/home/ec2-user/node-app/
 
-                echo "Starting app on EC2..."
-                ssh -o StrictHostKeyChecking=no -i $PEM_PATH $EC2_USER@$EC2_HOST 'cd /home/ec2-user/node-app && nohup node index.js > app.log 2>&1 &'
-                '''
-            }
-        }
+        echo "Starting app on EC2..."
+        ssh -o StrictHostKeyChecking=no -i $PEM_PATH $EC2_USER@$EC2_HOST 'cd /home/ec2-user/node-app && nohup node index.js > app.log 2>&1 &'
+        '''
+    }
+}
+
     }
 }
