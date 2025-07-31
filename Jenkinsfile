@@ -8,7 +8,7 @@ pipeline {
     environment {
         EC2_USER = "ec2-user"
         EC2_HOST = "54.225.55.201"
-        PEM_PATH = "LLB.pem" // Path to your private key stored on Jenkins server
+        PEM_PATH = "/Users/hemant7122/Jenkins/workspace/nodeJs/LLB.pem" // Path to your private key stored on Jenkins server
     }
 
     stages {
