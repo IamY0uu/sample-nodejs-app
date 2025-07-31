@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs "NodeJS_18"  // Jenkins mein configured Node.js tool
+        nodejs "NodeJS_18"  
     }
 
     environment {
@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/<your-username>/<repo-name>.git'  // 👈 apna repo link daalo
+                git 'https://github.com/IamY0uu/sample-nodejs-app.git'  
             }
         }
 
